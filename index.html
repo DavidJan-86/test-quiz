@@ -2,10 +2,118 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Test</title>
+  <title>Test znalostí</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .hidden { display: none; }
+    .question { margin-bottom: 15px; }
+    .correct { color: green; font-weight: bold; }
+    .wrong { color: red; font-weight: bold; }
+    .answer { margin-left: 20px; }
+  </style>
 </head>
 <body>
-  <h1>Ahoj Davide!</h1>
-  <button>Start test</button>
+  <h1>Test znalostí</h1>
+  <button id="startBtn">Start test</button>
+  <div id="quiz" class="hidden"></div>
+  <button id="nextBtn" class="hidden">Další</button>
+  <button id="submitBtn" class="hidden">Vyhodnotit test</button>
+  <div id="results" class="hidden"></div>
+
+  <script>
+    let allQuestions = [];
+    let selectedQuestions = [];
+    let currentQuestion = 0;
+    let userAnswers = [];
+    const numberOfQuestions = 3;
+
+    const startBtn = document.getElementById("startBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const quizDiv = document.getElementById("quiz");
+    const resultsDiv = document.getElementById("results");
+
+    async function loadQuestions() {
+      try {
+        const response = await fetch("questions.json");
+        allQuestions = await response.json();
+        const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+        selectedQuestions = shuffled.slice(0, numberOfQuestions);
+        console.log("Načtené otázky:", selectedQuestions);
+      } catch (error) {
+        console.error("Chyba při načítání otázek:", error);
+        quizDiv.innerHTML = "<p style='color:red;'>Nepodařilo se načíst otázky.</p>";
+      }
+    }
+
+    startBtn.addEventListener("click", async () => {
+      await loadQuestions();
+      startBtn.classList.add("hidden");
+      quizDiv.classList.remove("hidden");
+      nextBtn.classList.remove("hidden");
+      showQuestion();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      saveAnswer();
+      currentQuestion++;
+      if (currentQuestion < selectedQuestions.length) {
+        showQuestion();
+      } else {
+        quizDiv.classList.add("hidden");
+        nextBtn.classList.add("hidden");
+        submitBtn.classList.remove("hidden");
+      }
+    });
+
+    submitBtn.addEventListener("click", () => {
+      saveAnswer();
+      showResults();
+    });
+
+    function showQuestion() {
+      const q = selectedQuestions[currentQuestion];
+      quizDiv.innerHTML = `
+        <div class="question">
+          <p>${q.text}</p>
+          ${q.options.map((opt,i)=>`
+            <label><input type="radio" name="q${currentQuestion}" value="${i}"> ${opt}</label><br>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function saveAnswer() {
+      const selected = document.querySelector(`input[name="q${currentQuestion}"]:checked`);
+      userAnswers[currentQuestion] = selected ? parseInt(selected.value) : null;
+    }
+
+    function showResults() {
+      resultsDiv.classList.remove("hidden");
+      resultsDiv.innerHTML = "<h2>Výsledky testu</h2>";
+      selectedQuestions.forEach((q,i)=>{
+        const correct = q.answer;
+        const user = userAnswers[i];
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.innerHTML = `<p>${i+1}. ${q.text}</p>`;
+        q.options.forEach((opt,j)=>{
+          const span = document.createElement("span");
+          span.textContent = opt;
+          if (j === correct) span.classList.add("correct");
+          if (user === j && user !== correct) span.classList.add("wrong");
+          div.appendChild(span);
+          div.appendChild(document.createElement("br"));
+        });
+        if (user !== correct) {
+          const ans = document.createElement("div");
+          ans.classList.add("answer");
+          ans.textContent = "Správná odpověď: " + q.options[correct];
+          div.appendChild(ans);
+        }
+        resultsDiv.appendChild(div);
+      });
+    }
+  </script>
 </body>
 </html>
