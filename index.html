@@ -1,110 +1,56 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-  <meta charset="UTF-8">
-  <title>Interaktivní test</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .hidden { display: none; }
-    .question { margin-bottom: 15px; }
-    .correct { color: green; font-weight: bold; }
-    .wrong { color: red; font-weight: bold; }
-    .answer { margin-left: 20px; }
-  </style>
-</head>
-<body>
-  <h1>Test znalostí</h1>
-  <button id="startBtn">Start test</button>
-  <div id="quiz" class="hidden"></div>
-  <button id="nextBtn" class="hidden">Next</button>
-  <button id="submitBtn" class="hidden">Vyhodnotit test</button>
-  <div id="results" class="hidden"></div>
+<script>
+  let questions = [];
+  let selectedQuestions = [];
+  let currentQuestion = 0;
+  let userAnswers = [];
+  const numberOfQuestions = 2; // 🔧 zde nastavíš kolik otázek se má vygenerovat
 
-  <script>
-    let questions = [];
-    let currentQuestion = 0;
-    let userAnswers = [];
+  async function loadQuestions() {
+    const response = await fetch("questions.json");
+    const allQuestions = await response.json();
 
-    const startBtn = document.getElementById("startBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const submitBtn = document.getElementById("submitBtn");
-    const quizDiv = document.getElementById("quiz");
-    const resultsDiv = document.getElementById("results");
+    // náhodně zamíchat otázky
+    const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+    // vybrat jen požadovaný počet
+    selectedQuestions = shuffled.slice(0, numberOfQuestions);
+  }
 
-    // Načtení otázek ze souboru JSON
-    async function loadQuestions() {
-      const response = await fetch("questions.json");
-      questions = await response.json();
-    }
+  function showQuestion() {
+    const q = selectedQuestions[currentQuestion];
+    quizDiv.innerHTML = `
+      <div class="question">
+        <p>${q.text}</p>
+        ${q.options.map((opt,i)=>`
+          <label><input type="radio" name="q${currentQuestion}" value="${i}"> ${opt}</label><br>
+        `).join("")}
+      </div>
+    `;
+  }
 
-    startBtn.addEventListener("click", async () => {
-      await loadQuestions();
-      startBtn.classList.add("hidden");
-      quizDiv.classList.remove("hidden");
-      nextBtn.classList.remove("hidden");
-      showQuestion();
-    });
-
-    nextBtn.addEventListener("click", () => {
-      saveAnswer();
-      currentQuestion++;
-      if (currentQuestion < questions.length) {
-        showQuestion();
-      } else {
-        quizDiv.classList.add("hidden");
-        nextBtn.classList.add("hidden");
-        submitBtn.classList.remove("hidden");
-      }
-    });
-
-    submitBtn.addEventListener("click", () => {
-      saveAnswer();
-      showResults();
-    });
-
-    function showQuestion() {
-      const q = questions[currentQuestion];
-      quizDiv.innerHTML = `
-        <div class="question">
-          <p>${q.text}</p>
-          ${q.options.map((opt,i)=>`
-            <label><input type="radio" name="q${currentQuestion}" value="${i}"> ${opt}</label><br>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    function saveAnswer() {
-      const selected = document.querySelector(`input[name="q${currentQuestion}"]:checked`);
-      userAnswers[currentQuestion] = selected ? parseInt(selected.value) : null;
-    }
-
-    function showResults() {
-      resultsDiv.classList.remove("hidden");
-      resultsDiv.innerHTML = "<h2>Výsledky testu</h2>";
-      questions.forEach((q,i)=>{
-        const correct = q.answer;
-        const user = userAnswers[i];
-        const div = document.createElement("div");
-        div.classList.add("question");
-        div.innerHTML = `<p>${i+1}. ${q.text}</p>`;
-        q.options.forEach((opt,j)=>{
-          const span = document.createElement("span");
-          span.textContent = opt;
-          if (j === correct) span.classList.add("correct");
-          if (user === j && user !== correct) span.classList.add("wrong");
-          div.appendChild(span);
-          div.appendChild(document.createElement("br"));
-        });
-        if (user !== correct) {
-          const ans = document.createElement("div");
-          ans.classList.add("answer");
-          ans.textContent = "Správná odpověď: " + q.options[correct];
-          div.appendChild(ans);
-        }
-        resultsDiv.appendChild(div);
+  function showResults() {
+    resultsDiv.classList.remove("hidden");
+    resultsDiv.innerHTML = "<h2>Výsledky testu</h2>";
+    selectedQuestions.forEach((q,i)=>{
+      const correct = q.answer;
+      const user = userAnswers[i];
+      const div = document.createElement("div");
+      div.classList.add("question");
+      div.innerHTML = `<p>${i+1}. ${q.text}</p>`;
+      q.options.forEach((opt,j)=>{
+        const span = document.createElement("span");
+        span.textContent = opt;
+        if (j === correct) span.classList.add("correct");
+        if (user === j && user !== correct) span.classList.add("wrong");
+        div.appendChild(span);
+        div.appendChild(document.createElement("br"));
       });
-    }
-  </script>
-</body>
-</html>
+      if (user !== correct) {
+        const ans = document.createElement("div");
+        ans.classList.add("answer");
+        ans.textContent = "Správná odpověď: " + q.options[correct];
+        div.appendChild(ans);
+      }
+      resultsDiv.appendChild(div);
+    });
+  }
+</script>
