@@ -129,27 +129,28 @@ function showResults() {
     div.classList.add("question");
     div.innerHTML = `<p>${i+1}. ${q.text}</p>`;
     
-    q.options.forEach((opt,j)=>{
-      const span = document.createElement("span");
-      span.textContent = opt;
+   q.options.forEach((opt,j)=>{
+  const span = document.createElement("span");
+  span.textContent = opt;
 
-      if (user === null && j === correct) {
-        // žádná odpověď → správná odpověď červeně
-        span.classList.add("wrong");
-      } else if (user === j && user === correct) {
-        // správná odpověď vybraná → zeleně
-        span.classList.add("correct");
-      } else if (user === j && user !== correct) {
-        // špatná odpověď vybraná → červeně
-        span.classList.add("wrong");
-      } else if (j === correct) {
-        // správná odpověď, ale uživatel vybral něco jiného → zeleně
-        span.classList.add("correct");
-      }
+  if (user === j && user === correct) {
+    // správná odpověď vybraná → zeleně
+    span.classList.add("correct");
+  } else if (user === j && user !== correct) {
+    // špatná odpověď vybraná → červeně
+    span.classList.add("wrong");
+  } else if (j === correct) {
+    // správná odpověď, ale uživatel vybral něco jiného → zeleně
+    span.classList.add("correct");
+  } else if (user === null && j === correct) {
+    // žádná odpověď → správná odpověď červeně
+    span.classList.add("wrong");
+  }
 
-      div.appendChild(span);
-      div.appendChild(document.createElement("br"));
-    });
+  div.appendChild(span);
+  div.appendChild(document.createElement("br"));
+});
+
 
     if (user === correct) {
       correctCount++;
@@ -175,5 +176,6 @@ function showResults() {
   </script>
 </body>
 </html>
+
 
 
