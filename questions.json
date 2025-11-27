@@ -13,5 +13,15 @@
     "text": "Která řeka protéká Prahou?",
     "options": ["Labe", "Vltava", "Morava"],
     "answer": 1
+  },
+  {
+    "text": "Kdy začíná jaro?",
+    "options": ["21. března", "1. dubna", "15. března"],
+    "answer": 0
+  },
+  {
+    "text": "Který prvek má značku O?",
+    "options": ["Zlato", "Kyslík", "Uhlík"],
+    "answer": 1
   }
 ]
