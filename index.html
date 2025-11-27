@@ -10,10 +10,21 @@
     .correct { color: green; font-weight: bold; }
     .wrong { color: red; font-weight: bold; }
     .answer { margin-left: 20px; }
+    label { font-weight: bold; }
   </style>
 </head>
 <body>
   <h1>Test znalostí</h1>
+
+  <!-- Rolovací menu pro výběr počtu otázek -->
+  <label for="questionCount">Počet otázek:</label>
+  <select id="questionCount">
+    <option value="40">40</option>
+    <option value="60">60</option>
+    <option value="80">80</option>
+  </select>
+  <br><br>
+
   <button id="startBtn">Start test</button>
   <div id="quiz" class="hidden"></div>
   <button id="nextBtn" class="hidden">Další</button>
@@ -25,18 +36,24 @@
     let selectedQuestions = [];
     let currentQuestion = 0;
     let userAnswers = [];
-    const numberOfQuestions = 3;
+    let numberOfQuestions = 0; // bude nastaveno podle výběru
 
     const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
     const submitBtn = document.getElementById("submitBtn");
     const quizDiv = document.getElementById("quiz");
     const resultsDiv = document.getElementById("results");
+    const questionCountSelect = document.getElementById("questionCount");
 
     async function loadQuestions() {
       try {
         const response = await fetch("questions.json");
         allQuestions = await response.json();
+
+        // přečti hodnotu z menu
+        numberOfQuestions = parseInt(questionCountSelect.value);
+
+        // zamíchej otázky a vyber jen požadovaný počet
         const shuffled = allQuestions.sort(() => 0.5 - Math.random());
         selectedQuestions = shuffled.slice(0, numberOfQuestions);
         console.log("Načtené otázky:", selectedQuestions);
@@ -49,6 +66,7 @@
     startBtn.addEventListener("click", async () => {
       await loadQuestions();
       startBtn.classList.add("hidden");
+      questionCountSelect.disabled = true; // po startu zamkneme výběr
       quizDiv.classList.remove("hidden");
       nextBtn.classList.remove("hidden");
       showQuestion();
