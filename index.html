@@ -136,11 +136,15 @@ function showResults() {
       if (user === null && j === correct) {
         // žádná odpověď → správná odpověď červeně
         span.classList.add("wrong");
-      } else if (j === correct) {
+      } else if (user === j && user === correct) {
+        // správná odpověď vybraná → zeleně
         span.classList.add("correct");
-      }
-      if (user === j && user !== correct) {
+      } else if (user === j && user !== correct) {
+        // špatná odpověď vybraná → červeně
         span.classList.add("wrong");
+      } else if (j === correct) {
+        // správná odpověď, ale uživatel vybral něco jiného → zeleně
+        span.classList.add("correct");
       }
 
       div.appendChild(span);
@@ -166,8 +170,10 @@ function showResults() {
   // tlačítko nový test
   newTestBtn.classList.remove("hidden");
 }
+
    
   </script>
 </body>
 </html>
+
 
