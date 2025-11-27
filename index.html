@@ -11,12 +11,13 @@
     .wrong { color: red; font-weight: bold; }
     .answer { margin-left: 20px; }
     label { font-weight: bold; }
+    #newTestBtn { margin-top: 20px; }
   </style>
 </head>
 <body>
   <h1>Test znalostí</h1>
 
-  <!-- Rolovací menu pro výběr počtu otázek -->
+  <!-- Výběr počtu otázek -->
   <label for="questionCount">Počet otázek:</label>
   <select id="questionCount">
     <option value="40">40</option>
@@ -30,13 +31,14 @@
   <button id="nextBtn" class="hidden">Další</button>
   <button id="submitBtn" class="hidden">Vyhodnotit test</button>
   <div id="results" class="hidden"></div>
+  <button id="newTestBtn" class="hidden">Začít nový test</button>
 
   <script>
     let allQuestions = [];
     let selectedQuestions = [];
     let currentQuestion = 0;
     let userAnswers = [];
-    let numberOfQuestions = 0; // bude nastaveno podle výběru
+    let numberOfQuestions = 0;
 
     const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
@@ -44,16 +46,13 @@
     const quizDiv = document.getElementById("quiz");
     const resultsDiv = document.getElementById("results");
     const questionCountSelect = document.getElementById("questionCount");
+    const newTestBtn = document.getElementById("newTestBtn");
 
     async function loadQuestions() {
       try {
         const response = await fetch("questions.json");
         allQuestions = await response.json();
-
-        // přečti hodnotu z menu
         numberOfQuestions = parseInt(questionCountSelect.value);
-
-        // zamíchej otázky a vyber jen požadovaný počet
         const shuffled = allQuestions.sort(() => 0.5 - Math.random());
         selectedQuestions = shuffled.slice(0, numberOfQuestions);
         console.log("Načtené otázky:", selectedQuestions);
@@ -66,7 +65,7 @@
     startBtn.addEventListener("click", async () => {
       await loadQuestions();
       startBtn.classList.add("hidden");
-      questionCountSelect.disabled = true; // po startu zamkneme výběr
+      questionCountSelect.disabled = true;
       quizDiv.classList.remove("hidden");
       nextBtn.classList.remove("hidden");
       showQuestion();
@@ -89,11 +88,22 @@
       showResults();
     });
 
+    newTestBtn.addEventListener("click", () => {
+      // reset testu
+      currentQuestion = 0;
+      userAnswers = [];
+      resultsDiv.classList.add("hidden");
+      newTestBtn.classList.add("hidden");
+      submitBtn.classList.add("hidden");
+      startBtn.classList.remove("hidden");
+      questionCountSelect.disabled = false;
+    });
+
     function showQuestion() {
       const q = selectedQuestions[currentQuestion];
       quizDiv.innerHTML = `
         <div class="question">
-          <p>${q.text}</p>
+          <p><strong>Otázka ${currentQuestion+1} z ${selectedQuestions.length}:</strong> ${q.text}</p>
           ${q.options.map((opt,i)=>`
             <label><input type="radio" name="q${currentQuestion}" value="${i}"> ${opt}</label><br>
           `).join("")}
@@ -109,6 +119,8 @@
     function showResults() {
       resultsDiv.classList.remove("hidden");
       resultsDiv.innerHTML = "<h2>Výsledky testu</h2>";
+      let correctCount = 0;
+
       selectedQuestions.forEach((q,i)=>{
         const correct = q.answer;
         const user = userAnswers[i];
@@ -123,6 +135,7 @@
           div.appendChild(span);
           div.appendChild(document.createElement("br"));
         });
+        if (user === correct) correctCount++;
         if (user !== correct) {
           const ans = document.createElement("div");
           ans.classList.add("answer");
@@ -131,6 +144,14 @@
         }
         resultsDiv.appendChild(div);
       });
+
+      // skóre
+      const score = document.createElement("h3");
+      score.textContent = `Správně: ${correctCount} z ${selectedQuestions.length}`;
+      resultsDiv.appendChild(score);
+
+      // tlačítko nový test
+      newTestBtn.classList.remove("hidden");
     }
   </script>
 </body>
