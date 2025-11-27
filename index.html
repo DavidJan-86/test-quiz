@@ -18,15 +18,17 @@
   <h1>Test znalostí</h1>
 
   <!-- Výběr počtu otázek -->
-  <label for="questionCount">Počet otázek:</label>
-  <select id="questionCount">
-    <option value="40">40</option>
-    <option value="60">60</option>
-    <option value="80">80</option>
-  </select>
-  <br><br>
+  <div id="startSection">
+    <label for="questionCount">Počet otázek:</label>
+    <select id="questionCount">
+      <option value="40">40</option>
+      <option value="60">60</option>
+      <option value="80">80</option>
+    </select>
+    <br><br>
+    <button id="startBtn">Start test</button>
+  </div>
 
-  <button id="startBtn">Start test</button>
   <div id="quiz" class="hidden"></div>
   <button id="nextBtn" class="hidden">Další</button>
   <button id="submitBtn" class="hidden">Vyhodnotit test</button>
@@ -40,6 +42,7 @@
     let userAnswers = [];
     let numberOfQuestions = 0;
 
+    const startSection = document.getElementById("startSection");
     const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
     const submitBtn = document.getElementById("submitBtn");
@@ -55,7 +58,6 @@
         numberOfQuestions = parseInt(questionCountSelect.value);
         const shuffled = allQuestions.sort(() => 0.5 - Math.random());
         selectedQuestions = shuffled.slice(0, numberOfQuestions);
-        console.log("Načtené otázky:", selectedQuestions);
       } catch (error) {
         console.error("Chyba při načítání otázek:", error);
         quizDiv.innerHTML = "<p style='color:red;'>Nepodařilo se načíst otázky.</p>";
@@ -64,8 +66,7 @@
 
     startBtn.addEventListener("click", async () => {
       await loadQuestions();
-      startBtn.classList.add("hidden");
-      questionCountSelect.disabled = true;
+      startSection.classList.add("hidden");
       quizDiv.classList.remove("hidden");
       nextBtn.classList.remove("hidden");
       showQuestion();
@@ -95,8 +96,8 @@
       resultsDiv.classList.add("hidden");
       newTestBtn.classList.add("hidden");
       submitBtn.classList.add("hidden");
-      startBtn.classList.remove("hidden");
-      questionCountSelect.disabled = false;
+      quizDiv.classList.add("hidden");
+      startSection.classList.remove("hidden"); // znovu zobrazíme začátek
     });
 
     function showQuestion() {
@@ -135,8 +136,10 @@
           div.appendChild(span);
           div.appendChild(document.createElement("br"));
         });
-        if (user === correct) correctCount++;
-        if (user !== correct) {
+        // pokud nebyla vybrána žádná odpověď, bereme to jako chybu
+        if (user === correct) {
+          correctCount++;
+        } else {
           const ans = document.createElement("div");
           ans.classList.add("answer");
           ans.textContent = "Správná odpověď: " + q.options[correct];
