@@ -1,56 +1,11 @@
-<script>
-  let questions = [];
-  let selectedQuestions = [];
-  let currentQuestion = 0;
-  let userAnswers = [];
-  const numberOfQuestions = 2; // 🔧 zde nastavíš kolik otázek se má vygenerovat
-
-  async function loadQuestions() {
-    const response = await fetch("questions.json");
-    const allQuestions = await response.json();
-
-    // náhodně zamíchat otázky
-    const shuffled = allQuestions.sort(() => 0.5 - Math.random());
-    // vybrat jen požadovaný počet
-    selectedQuestions = shuffled.slice(0, numberOfQuestions);
-  }
-
-  function showQuestion() {
-    const q = selectedQuestions[currentQuestion];
-    quizDiv.innerHTML = `
-      <div class="question">
-        <p>${q.text}</p>
-        ${q.options.map((opt,i)=>`
-          <label><input type="radio" name="q${currentQuestion}" value="${i}"> ${opt}</label><br>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  function showResults() {
-    resultsDiv.classList.remove("hidden");
-    resultsDiv.innerHTML = "<h2>Výsledky testu</h2>";
-    selectedQuestions.forEach((q,i)=>{
-      const correct = q.answer;
-      const user = userAnswers[i];
-      const div = document.createElement("div");
-      div.classList.add("question");
-      div.innerHTML = `<p>${i+1}. ${q.text}</p>`;
-      q.options.forEach((opt,j)=>{
-        const span = document.createElement("span");
-        span.textContent = opt;
-        if (j === correct) span.classList.add("correct");
-        if (user === j && user !== correct) span.classList.add("wrong");
-        div.appendChild(span);
-        div.appendChild(document.createElement("br"));
-      });
-      if (user !== correct) {
-        const ans = document.createElement("div");
-        ans.classList.add("answer");
-        ans.textContent = "Správná odpověď: " + q.options[correct];
-        div.appendChild(ans);
-      }
-      resultsDiv.appendChild(div);
-    });
-  }
-</script>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+</head>
+<body>
+  <h1>Ahoj Davide!</h1>
+  <button>Start test</button>
+</body>
+</html>
