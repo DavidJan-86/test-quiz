@@ -117,45 +117,57 @@
       userAnswers[currentQuestion] = selected ? parseInt(selected.value) : null;
     }
 
-    function showResults() {
-      resultsDiv.classList.remove("hidden");
-      resultsDiv.innerHTML = "<h2>Výsledky testu</h2>";
-      let correctCount = 0;
+function showResults() {
+  resultsDiv.classList.remove("hidden");
+  resultsDiv.innerHTML = "<h2>Výsledky testu</h2>";
+  let correctCount = 0;
 
-      selectedQuestions.forEach((q,i)=>{
-        const correct = q.answer;
-        const user = userAnswers[i];
-        const div = document.createElement("div");
-        div.classList.add("question");
-        div.innerHTML = `<p>${i+1}. ${q.text}</p>`;
-        q.options.forEach((opt,j)=>{
-          const span = document.createElement("span");
-          span.textContent = opt;
-          if (j === correct) span.classList.add("correct");
-          if (user === j && user !== correct) span.classList.add("wrong");
-          div.appendChild(span);
-          div.appendChild(document.createElement("br"));
-        });
-        // pokud nebyla vybrána žádná odpověď, bereme to jako chybu
-        if (user === correct) {
-          correctCount++;
-        } else {
-          const ans = document.createElement("div");
-          ans.classList.add("answer");
-          ans.textContent = "Správná odpověď: " + q.options[correct];
-          div.appendChild(ans);
-        }
-        resultsDiv.appendChild(div);
-      });
+  selectedQuestions.forEach((q,i)=>{
+    const correct = q.answer;
+    const user = userAnswers[i];
+    const div = document.createElement("div");
+    div.classList.add("question");
+    div.innerHTML = `<p>${i+1}. ${q.text}</p>`;
+    
+    q.options.forEach((opt,j)=>{
+      const span = document.createElement("span");
+      span.textContent = opt;
 
-      // skóre
-      const score = document.createElement("h3");
-      score.textContent = `Správně: ${correctCount} z ${selectedQuestions.length}`;
-      resultsDiv.appendChild(score);
+      if (user === null && j === correct) {
+        // žádná odpověď → správná odpověď červeně
+        span.classList.add("wrong");
+      } else if (j === correct) {
+        span.classList.add("correct");
+      }
+      if (user === j && user !== correct) {
+        span.classList.add("wrong");
+      }
 
-      // tlačítko nový test
-      newTestBtn.classList.remove("hidden");
+      div.appendChild(span);
+      div.appendChild(document.createElement("br"));
+    });
+
+    if (user === correct) {
+      correctCount++;
+    } else {
+      const ans = document.createElement("div");
+      ans.classList.add("answer");
+      ans.textContent = "Správná odpověď: " + q.options[correct];
+      div.appendChild(ans);
     }
+    resultsDiv.appendChild(div);
+  });
+
+  // skóre
+  const score = document.createElement("h3");
+  score.textContent = `Správně: ${correctCount} z ${selectedQuestions.length}`;
+  resultsDiv.appendChild(score);
+
+  // tlačítko nový test
+  newTestBtn.classList.remove("hidden");
+}
+   
   </script>
 </body>
 </html>
+
