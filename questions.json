@@ -1,0 +1,17 @@
+[
+  {
+    "text": "Jaká je hlavní město ČR?",
+    "options": ["Brno", "Praha", "Ostrava"],
+    "answer": 1
+  },
+  {
+    "text": "Kolik má ČR krajů?",
+    "options": ["10", "12", "14"],
+    "answer": 2
+  },
+  {
+    "text": "Která řeka protéká Prahou?",
+    "options": ["Labe", "Vltava", "Morava"],
+    "answer": 1
+  }
+]
