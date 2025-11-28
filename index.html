@@ -139,12 +139,12 @@ function showResults() {
   } else if (user === j && user !== correct) {
     // špatná odpověď vybraná → červeně
     span.classList.add("wrong");
-  } else if (j === correct) {
-    // správná odpověď, ale uživatel vybral něco jiného → zeleně
-    span.classList.add("correct");
   } else if (user === null && j === correct) {
     // žádná odpověď → správná odpověď červeně
     span.classList.add("wrong");
+  } else if (j === correct) {
+    // správná odpověď, ale uživatel vybral něco jiného → zeleně
+    span.classList.add("correct");
   }
 
   div.appendChild(span);
@@ -176,6 +176,7 @@ function showResults() {
   </script>
 </body>
 </html>
+
 
 
 
